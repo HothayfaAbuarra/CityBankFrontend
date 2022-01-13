@@ -20,6 +20,15 @@ import Footer from '../Layout/Footer.vue';
 import Header from '../Layout/Header.vue';
 import icon from '../profile_edit/iconProfile.vue';
 export default {
+    beforeCreate(){
+        if(localStorage.getItem("auth")==null)
+        {
+            this.$router.push('/');
+        }
+        if(localStorage.getItem("type")=="Teller"){
+            this.$router.push('/TellerHome');
+        }
+    },
     components:{
         'app-header':Header,
         'app-footer':Footer,

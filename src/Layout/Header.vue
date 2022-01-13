@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <header>
-            <div class="logout">
+            <div class="logout" v-on:click="LogOut">
             <i class="fas fa-sign-out-alt" id="logout">logout</i>
             </div>
             <!-- <div class="welcome">
@@ -19,6 +19,12 @@ export default {
     data:function(){
         return{
             title:"CityBank"
+        }
+    },
+    methods:{
+        LogOut:function(){
+            localStorage.removeItem("auth")
+            this.$router.push("/");
         }
     }
 }

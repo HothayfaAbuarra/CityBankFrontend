@@ -23,6 +23,27 @@
                 </div>
             </div>
         </div>
+                            <Modal v-if="!valid"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{message}}
+                            </template>
+
+                            </Modal>
+
+                            <Modal v-if="valid"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{message2}}
+                            </template>
+
+                            </Modal>
         <app-footer></app-footer>
     </div>
 </template>
@@ -30,8 +51,18 @@
 import Header from '../Layout/Header.vue';
 import Footer from '../Layout/Footer.vue';
 import axios from 'axios';
+import Modal from '../modal/modal.vue';
 import pulseloader from 'vue-spinner/src/PulseLoader.vue';
 export default {
+    beforeCreate(){
+        if(localStorage.getItem("auth")==null)
+        {
+            this.$router.push('/');
+        }
+        if(localStorage.getItem("type")=="Teller"){
+            this.$router.push('/TellerHome');
+        }
+    },
     data:function(){
         return{
             errors:{
@@ -39,13 +70,18 @@ export default {
             },
             identity:null,
             loading:false,
-            Opacity:.5
+            Opacity:.5,
+            isModalVisible: false,
+            valid:false,
+            message:"",
+            message2:""
         }
     },
     components:{
         'app-header':Header,
         'app-footer':Footer,
-        'loader':pulseloader
+        'loader':pulseloader,
+        Modal
     },
     methods:{
         identityValidation:function(){
@@ -63,6 +99,12 @@ export default {
             }
             // end identity validation
         },
+        showModal() {
+        this.isModalVisible = true;
+        },
+        closeModal() {
+            this.isModalVisible = false;
+        },
         onSubmit:function(){
             this.identityValidation();
             if(this.errors.identityError.length==0){
@@ -72,8 +114,18 @@ export default {
                 }
                 axios.delete("https://localhost:44336/api/Admin/DeleteAccount/"+id.identity,{
                     headers: {'Access-Control-Allow-Origin': "*" },
-                }).then(()=>{
-                    alert("Deleted account successfully");
+                }).then((res)=>{
+                    if(res.data==false){
+                        this.valid=false;
+                        this.message="There is no account for this identity number"
+                        this.showModal();
+                        //alert("There is no account for this identity number");
+                        this.loading=false;
+                        return;
+                    }
+                    this.valid=true;
+                    this.message2="Deleted account successfully";
+                    this.showModal();
                     this.loading=false;
                 });
             }

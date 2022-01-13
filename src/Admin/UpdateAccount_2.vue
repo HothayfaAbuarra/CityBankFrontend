@@ -56,6 +56,27 @@
                 </div>
             </div>
         </div>
+                            <Modal v-if="!valid"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{message}}
+                            </template>
+
+                            </Modal>
+
+                            <Modal v-if="valid"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{message2}}
+                            </template>
+
+                            </Modal>
         <app-footer></app-footer>
     </div>
 </template>
@@ -63,12 +84,23 @@
 import Header from '../Layout/Header.vue';
 import Footer from '../Layout/Footer.vue';
 import axios from 'axios';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+import Modal from '../modal/modal.vue';
 export default {
+    beforeCreate(){
+        if(localStorage.getItem("auth")==null)
+        {
+            this.$router.push('/');
+        }
+        if(localStorage.getItem("type")=="Teller"){
+            this.$router.push('/TellerHome');
+        }
+    },
     components:{
         'app-header':Header,
         'app-footer':Footer,
-        'loader':PulseLoader
+        'loader':PulseLoader,
+        Modal
     },
     data:function(){
         return{
@@ -83,7 +115,11 @@ export default {
             },
             Data:null,
             loading:false,
-            Opacity:.5
+            Opacity:.5,
+            isModalVisible: false,
+            valid:false,
+            message:"",
+            message2:""
         }
     },
     beforeMount(){
@@ -192,6 +228,12 @@ export default {
             }
             // end balance validation
         },
+        showModal() {
+        this.isModalVisible = true;
+        },
+        closeModal() {
+            this.isModalVisible = false;
+        },
         onSubmit:function(){
             this.nameValidation();
             this.emailValidation();
@@ -205,9 +247,9 @@ export default {
                 let customer={
                     customer_name:this.Data.customer.customer_name,
                     customer_email:this.Data.customer.customer_email,
-                    customer_identity:parseInt(this.Data.customer.customer_identity),
+                    customer_identity:this.Data.customer.customer_identity,
                     customer_age:this.Data.customer.customer_age,
-                    customer_phone:parseInt(this.Data.customer.customer_phone)
+                    customer_phone:parseFloat(this.Data.customer.customer_phone)
                 }
                 let account={
                     account_type:this.Data.account.account_type
@@ -219,8 +261,14 @@ export default {
                 axios.put("https://localhost:44336/api/Admin/UpdateAccount/",obj,{
                     headers: {'Access-Control-Allow-Origin': "*" },
                 }).then(()=>{
-                    alert("Update Account sucessfully");
+                    this.valid=true;
+                    this.message2="Update Account sucessfully";
+                    this.showModal();
                     this.loading=false
+                }).catch(()=>{
+                    this.valid=false;
+                    this.showModal();
+                    this.message="Error updating account";
                 })
             }
         }

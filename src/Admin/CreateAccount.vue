@@ -59,6 +59,27 @@
                 </div>
             </div>
         </div>
+                            <Modal v-if="!valid"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{message}}
+                            </template>
+
+                            </Modal>
+
+                            <Modal v-if="valid"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{message2}}
+                            </template>
+
+                            </Modal>
         <app-footer></app-footer>
     </div>
 </template>
@@ -66,12 +87,23 @@
 import Header from '../Layout/Header.vue';
 import Footer from '../Layout/Footer.vue';
 import axios from 'axios';
+import Modal from '../modal/modal.vue';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 export default {
+    beforeCreate(){
+        if(localStorage.getItem("auth")==null)
+        {
+            this.$router.push('/');
+        }
+        if(localStorage.getItem("type")=="Teller"){
+            this.$router.push('/TellerHome');
+        }
+    },
     components:{
         'app-header':Header,
         'app-footer':Footer,
-        'loader':PulseLoader
+        'loader':PulseLoader,
+        Modal
     },
     data:function(){
             return{
@@ -93,7 +125,11 @@ export default {
                 balance:"",
                 submitError:false,
                 loading:false,
-                Opacity:.5
+                Opacity:.5,
+                isModalVisible: false,
+                valid:false,
+                message:"",
+                message2:""
             }
     },
     methods:{
@@ -196,6 +232,12 @@ export default {
             }
             // end balance validation
         },
+        showModal() {
+        this.isModalVisible = true;
+        },
+        closeModal() {
+            this.isModalVisible = false;
+        },
         onSubmit:function(){
             this.nameValidation();
             this.emailValidation();
@@ -229,7 +271,7 @@ export default {
                 axios.post("https://localhost:44336/api/Admin/CreateAccount/",obj,{
                     headers: {'Access-Control-Allow-Origin': "*" },
                     //mode: 'cors',
-                }).then(()=>{
+                }).then((res)=>{
                     this.customer_name="";
                     this.customer_email="";
                     this.customer_identity="";
@@ -238,7 +280,14 @@ export default {
                     this.account_type="";
                     this.balance="";
                     this.loading=false;
-                    alert("You Create account sucessfully");
+                    if(res.data=="00000000-0000-0000-0000-000000000000"){
+                        this.showModal();
+                        this.message="There is an account for this identity numebr";
+                        return;
+                    }
+                    this.valid=true;
+                    this.showModal();
+                    this.message2="You Create account sucessfully"
                 })
             }
         }

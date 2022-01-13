@@ -67,6 +67,31 @@
                 </div>
             
         </div>
+                            <!-- Modal for withdraw -->
+                            <Modal v-if="validWithdraw"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{withdrawMessage}}
+                            </template>
+
+                            </Modal>
+                            <!-- end of modal for withdraw -->
+
+                            <!-- Modal for deposit -->
+                            <Modal v-if="validDeposit"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{deposetMessage}}
+                            </template>
+
+                            </Modal>
+                            <!-- end of modal for deposit -->
         <app-footer></app-footer>
     </div>
 </template>
@@ -76,12 +101,23 @@ import Footer from '../Layout/Footer.vue';
 import icon from '../profile_edit/iconProfile.vue';
 import axios from 'axios';
 import pulseloader from 'vue-spinner/src/PulseLoader.vue';
+import Modal from '../modal/modal.vue';
 export default {
+    beforeCreate(){
+        if(localStorage.getItem("auth")==null)
+        {
+            this.$router.push('/');
+        }
+        if(localStorage.getItem("type")=="Admin"){
+            this.$router.push('/AdminHome');
+        }
+    },
     components:{
         "app-header":Header,
         "app-footer":Footer,
         "profile-icon":icon,
-        'loader':pulseloader
+        'loader':pulseloader,
+        Modal
     },
     data:function(){
         return {
@@ -104,7 +140,12 @@ export default {
                 depositMonyError:[]
             },
             loading:false,
-            Opacity:.5
+            Opacity:.5,
+            isModalVisible: false,
+            validWithdraw:true,
+            validDeposit:true,
+            withdrawMessage:"",
+            deposetMessage:""
         }
     },
     methods:{
@@ -168,6 +209,12 @@ export default {
             }
             // end monu validation
         },
+        showModal() {
+        this.isModalVisible = true;
+        },
+        closeModal() {
+            this.isModalVisible = false;
+        },
         onChange:function(Type){
             if(Type=="1"){
                 this.step1=false;
@@ -199,7 +246,8 @@ export default {
                     headers: {'Access-Control-Allow-Origin': "*" },
                 }).then(res=>{
                     this.loading=false;
-                    alert("You deposit from this account sucesfully. the balance now is:"+res.data);
+                    this.deposetMessage=res.data
+                    this.showModal();
                 })
             }
             
@@ -215,7 +263,8 @@ export default {
                     headers: {'Access-Control-Allow-Origin': "*" },
                 }).then(res=>{
                     this.loading=false;
-                    alert("You withdraw from this account sucesfully. the balance now is:"+res.data);
+                    this.withdrawMessage=res.data
+                    this.showModal();
                 })
             }
         }

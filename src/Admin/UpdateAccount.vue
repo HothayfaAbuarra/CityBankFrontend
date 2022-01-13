@@ -32,6 +32,15 @@ import Footer from '../Layout/Footer.vue';
 import axios from 'axios';
 import pulseloader from 'vue-spinner/src/PulseLoader.vue';
 export default {
+    beforeCreate(){
+        if(localStorage.getItem("auth")==null)
+        {
+            this.$router.push('/');
+        }
+        if(localStorage.getItem("type")=="Teller"){
+            this.$router.push('/TellerHome');
+        }
+    },
     components:{
         'app-header':Header,
         'app-footer':Footer,
@@ -73,7 +82,7 @@ export default {
                 this.loading=true;
                 axios.get("https://localhost:44336/api/Admin/GetCustomer/"+this.identity,{
                 headers: {'Access-Control-Allow-Origin': "*" },
-                }).then(res=>{
+                }).then((res)=>{
                     if(res.data.customer!=null)
                     {
                     this.customer=res.data.customer;
@@ -81,6 +90,9 @@ export default {
                     this.balance=res.data.balance
                     this.$store.commit("setCustomer",{customer:this.customer,account:this.account,Balance:this.balance});
                     this.$router.push('/Update');
+                    }else{
+                        this.loading=false;
+                        alert("There is no account for this identity number");
                     }
                 })
             }

@@ -44,14 +44,36 @@
                 </form>
             </div>
         </div>
+                            <Modal v-if="!valid"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{message}}
+                            </template>
+
+                            </Modal>
+                            <Modal v-if="valid"
+                            v-show="isModalVisible"
+                            @close="closeModal"
+                            >
+
+                            <template v-slot:body>
+                                {{message2}}
+                            </template>
+
+                            </Modal>
     </div>
 </template>
 <script>
 import axios from 'axios';
 import pulseloader from 'vue-spinner/src/PulseLoader.vue';
+import Modal from '../modal/modal.vue';
 export default {
     components:{
-        'loader':pulseloader
+        'loader':pulseloader,
+        Modal
     },
     data:function(){
         return{
@@ -73,7 +95,11 @@ export default {
             inputType:"password",
             activeColor:"black",
             loading:false,
-            Opacity:.5
+            Opacity:.5,
+            isModalVisible: false,
+            valid:false,
+            message:"",
+            message2:""
         }
     },
     methods:{
@@ -153,6 +179,12 @@ export default {
             }
             //End department required   
         },
+        showModal() {
+        this.isModalVisible = true;
+        },
+        closeModal() {
+            this.isModalVisible = false;
+        },
         onSubmit:function(){
             this.IdentityValidation();
             this.usernameValidation();
@@ -171,10 +203,19 @@ export default {
                 }
                 axios.post("https://localhost:44336/api/employee/create",obj,{
                     headers: {'Access-Control-Allow-Origin': "*" },
-                }).then(()=>{
+                }).then((res)=>{
+                    if(res.data=="00000000-0000-0000-0000-000000000000"){
+                        this.loading=false
+                        this.valid=false;
+                        this.message="The username or identitynumber is taken";
+                        this.showModal();
+                        return;
+                    }
+                    this.valid=true;
+                    this.message2="You Are Added sucesfully";
+                    this.showModal();
                     this.loading=false
                     this.$router.push('/');
-                    alert("You Are Added sucesfully");
                 })
             }
             

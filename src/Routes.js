@@ -6,6 +6,7 @@ import CreateAccount from './Admin/CreateAccount.vue';
 import UpdateAccount from './Admin/UpdateAccount.vue';
 import DeleteAccount from './Admin/DeleteAccount.vue';
 import UpdateAccountv from './Admin/UpdateAccount_2.vue';
+import ProfileUpdate from './Admin/ProfileUpdate.vue';
 export default[
     {path:'/login',component:Login},
     {path:'/SignUp',component:SignUp},
@@ -16,4 +17,5 @@ export default[
     {path:'/UpdateAccount',component:UpdateAccount},
     {path:'/DeleteAccount',component:DeleteAccount},
     {path:'/Update',component:UpdateAccountv},
+    {path:'/profile',component:ProfileUpdate}
 ]
