@@ -79,9 +79,13 @@ export default {
             this.identityValidation();
             if(this.errors.identityError.length==0)
             {
+                let token=localStorage.getItem("auth");
                 this.loading=true;
                 axios.get("https://localhost:44336/api/Admin/GetCustomer/"+this.identity,{
-                headers: {'Access-Control-Allow-Origin': "*" },
+                headers: {
+                    'Access-Control-Allow-Origin': "*" ,
+                    "Authorization" : `Bearer ${token}`
+                },
                 }).then((res)=>{
                     if(res.data.customer!=null)
                     {

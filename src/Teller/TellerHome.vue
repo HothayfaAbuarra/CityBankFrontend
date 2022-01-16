@@ -241,9 +241,12 @@ export default {
             if(this.errors.depositMonyError.length==0 && this.errors.depositIdentityError.length==0){
                 this.loading=true;
                 let obj={id:parseInt(this.depositObject.deposit_identity),mony:parseFloat(this.depositObject.deposit_mony)}
-                console.log(typeof obj.id)
+                let token=localStorage.getItem("auth");
                 axios.put("https://localhost:44336/api/teller/deposit",obj,{
-                    headers: {'Access-Control-Allow-Origin': "*" },
+                    headers: {
+                        'Access-Control-Allow-Origin': "*",
+                        "Authorization" : `Bearer ${token}`
+                    },
                 }).then(res=>{
                     this.loading=false;
                     this.deposetMessage=res.data
@@ -258,10 +261,14 @@ export default {
             if(this.errors.WithdrawIdentityError.length==0 && this.errors.WithdrawMonyError.length==0){
                 this.loading=true;
                 let obj={id:parseInt(this.withdrawObject.withdraw_identity),mony:parseFloat(this.withdrawObject.withdraw_mony)}
-                console.log(typeof obj.id)
+                let token=localStorage.getItem("auth");
                 axios.put("https://localhost:44336/api/teller/withdraw",obj,{
-                    headers: {'Access-Control-Allow-Origin': "*" },
+                    headers: {
+                        'Access-Control-Allow-Origin': "*",
+                        "Authorization" : `Bearer ${token}`
+                    },
                 }).then(res=>{
+                    this.validWithdraw=true;
                     this.loading=false;
                     this.withdrawMessage=res.data
                     this.showModal();

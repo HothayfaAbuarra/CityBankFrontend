@@ -247,6 +247,7 @@ export default {
             this.typeValidation();
             this.balanceValidation();
             if(this.errors.nameError.length==0 && this.errors.emailError.length==0 && this.errors.identityError.length==0 && this.errors.ageError.length==0 && this.errors.phoneError.length==0 && this.errors.typeError.length==0 && this.errors.balanceError.length==0){
+                let token=localStorage.getItem("auth");
                 this.submitError=false;
                 this.loading=true;
                 let customer={
@@ -269,7 +270,10 @@ export default {
                 }
                 let obj={customer,account,balance}
                 axios.post("https://localhost:44336/api/Admin/CreateAccount/",obj,{
-                    headers: {'Access-Control-Allow-Origin': "*" },
+                    headers: {
+                        'Access-Control-Allow-Origin': "*" ,
+                        "Authorization" : `Bearer ${token}`
+                    },
                     //mode: 'cors',
                 }).then((res)=>{
                     this.customer_name="";

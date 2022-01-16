@@ -108,12 +108,16 @@ export default {
         onSubmit:function(){
             this.identityValidation();
             if(this.errors.identityError.length==0){
+                let token=localStorage.getItem("auth");
                 this.loading=true;
                 let id={
                     identity:parseInt(this.identity)
                 }
                 axios.delete("https://localhost:44336/api/Admin/DeleteAccount/"+id.identity,{
-                    headers: {'Access-Control-Allow-Origin': "*" },
+                    headers: {
+                        'Access-Control-Allow-Origin': "*" ,
+                        "Authorization" : `Bearer ${token}`
+                    },
                 }).then((res)=>{
                     if(res.data==false){
                         this.valid=false;

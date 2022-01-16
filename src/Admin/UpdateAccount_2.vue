@@ -244,6 +244,7 @@ export default {
             this.balanceValidation();
             if(this.errors.nameError.length==0 && this.errors.emailError.length==0 && this.errors.identityError.length==0 && this.errors.ageError.length==0 && this.errors.phoneError.length==0 && this.errors.typeError.length==0 && this.errors.balanceError.length==0){
                 this.loading=true
+                let token=localStorage.getItem("auth");
                 let customer={
                     customer_name:this.Data.customer.customer_name,
                     customer_email:this.Data.customer.customer_email,
@@ -259,7 +260,10 @@ export default {
                 }
                 let obj={customer,account,balance}
                 axios.put("https://localhost:44336/api/Admin/UpdateAccount/",obj,{
-                    headers: {'Access-Control-Allow-Origin': "*" },
+                    headers: {
+                        'Access-Control-Allow-Origin': "*" ,
+                        "Authorization" : `Bearer ${token}`
+                    },
                 }).then(()=>{
                     this.valid=true;
                     this.message2="Update Account sucessfully";

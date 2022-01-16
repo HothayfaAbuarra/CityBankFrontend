@@ -97,14 +97,20 @@ export default {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
         
-        axios.get(`https://localhost:44336/api/employee/GetEmployee/${JSON.parse(jsonPayload).nameid}`,{
-            headers: {'Access-Control-Allow-Origin': "*" },
+        let token=localStorage.getItem("auth");
+
+
+        axios.get(`https://localhost:44336/api/employee/GetEmployee/${JSON.parse(jsonPayload).id}`,{
+            headers: {
+                'Access-Control-Allow-Origin': "*" ,
+                "Authorization" : `Bearer ${token}`
+            },
         }).then(res=>{
             this.loading=false;
             this.name=res.data.employee_username;
             this.email=res.data.employee_Email;
             this.identity=res.data.employee_identity;
-            this.id=JSON.parse(jsonPayload).nameid
+            this.id=JSON.parse(jsonPayload).id  
         }).catch(error=>{
             console.log(error)
         })
@@ -171,10 +177,16 @@ export default {
             this.nameValidation();
             this.emailValidation();
             this.IdentityValidation()
+            
             if(this.errors.nameError.length==0 && this.errors.emailError.length==0 && this.errors.identityError.length==0){
                 let obj={employee_username:this.name,employee_Email:this.email,employee_identity:parseInt(this.identity)}
+                let token=localStorage.getItem("auth");
                 axios.put   (`https://localhost:44336/api/employee/UpdateEmployee/${this.id}`,obj,{
-                    headers: {'Access-Control-Allow-Origin': "*" },
+                    headers: {
+                        'Access-Control-Allow-Origin': "*" ,
+                        "Authorization" : `Bearer ${token}`
+                    },
+                    
                 }).then(()=>{
                     this.valid=false;
                     this.message="Update Account Sucessfully"
